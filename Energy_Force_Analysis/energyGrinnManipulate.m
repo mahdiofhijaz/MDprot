@@ -8,6 +8,8 @@ function [energies, Xres, Yres, f] = energyGrinnManipulate(pdb, data_imp, forces
 %% Description:
 % *energies are the non-bonded CHARMM energies of residue pairs at each frame. 
 %  All energies from gRINN are in kcal/mol
+%  Energies as time-series data are smoothed with a window of around 1% of
+%  the length of the data
 %
 % * Xres and Yres are the residue pair for each column of energies. For
 % example: energies(:,1) will give you a time series for pairwise energy 
@@ -62,6 +64,12 @@ for pair =1:size(energies,2)
     Xres(pair) = pair_double(1);
     Yres(pair) = pair_double(2);
 end
+
+% Smooth the energy before filling the energy map:
+% Smoothing window is 1% of the data length
+smoothing_window = ceil(nFrames/100); 
+energies_smooth = movmean(energies,smoothing_window);
+energies = energies_smooth;
 
 % Fill the energy map for each frame:
 for frame = 1:length(frames)

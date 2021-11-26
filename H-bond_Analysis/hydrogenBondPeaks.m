@@ -65,8 +65,8 @@ function [nHBonds,peak_loc,delta_res,delta_val] = hydrogenBondPeaks(pdb, traj, f
 %
 % * smoothing and MPP are paramters for tweaking finding the peaks in
 % forces, where smoothing is performed using a moving average for the force
-% trace, and MPP is the minimum peak prominence. Default to smoothing: 1500
-% and MPP: 100.
+% trace, and MPP is the minimum peak prominence. Default to smoothing: 
+% length(forces)/622 (placeholder at the moment), and MPP: 150.
 %
 %  See also hydrogenBondAnalysis, hydrogenBondManipulate, hydrogenBondEnergy
 
@@ -99,10 +99,10 @@ end
 % Smoothing and MPP need to be balanced out manually to optimally find the peaks.
 % I need to find a method that automatically finds good values for smoothing and MPP
 if ~exist('smoothing','var')
-    smoothing = 1500;
+    smoothing = length(forces)/622; % This is a current placeholder
 end
 if ~exist('MPP','var')
-    MPP = 100; % Minimum peak prominence
+    MPP = 150; % Minimum peak prominence
 end
 
 forces_smooth= smoothdata(forces,'movmean', smoothing); 

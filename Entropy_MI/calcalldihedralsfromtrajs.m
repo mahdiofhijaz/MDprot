@@ -62,7 +62,9 @@ end
 if nargin<6
     transform = 0;
 end
-    
+
+assert(size(pdb.xyz,1) == size(traj,2)/3, 'PDB and trajectory have different number of atoms!')
+
 dihedrals = cell(length(rotamers),numRuns);
 resname_cell = cell(length(rotamers),numRuns);
 dihIndex = zeros(length(rotamers),7); % indexes present dihedrals, 7 for 2 BB + 5 Chi
@@ -128,11 +130,13 @@ for resNum=rotamers    % Choose a residue from the list of rotamers
     % reSort section!!!!!
     if calc_bb(1)
         temp = find(index_phi);
-        reSort = [reSort; counter 1 temp(2) temp(3)]; % Phi -> 1
+%         reSort = [reSort; counter 1 temp(2) temp(3)]; % Phi -> 1
+    reSort = [reSort; counter 1 temp']; % Phi -> 1
     end
     if calc_bb(2)
         temp = find(index_psi);
-        reSort= [reSort; counter 2 temp(2) temp(3)]; % Psi -> 2
+%         reSort= [reSort; counter 2 temp(2) temp(3)]; % Psi -> 2
+        reSort= [reSort; counter 2 temp']; % Psi -> 2
     end
     
     % CHI1 index-searching:
@@ -165,7 +169,8 @@ for resNum=rotamers    % Choose a residue from the list of rotamers
     % reSort section!!!!!
     if calc_chi1
         temp = find(index_dihedral);
-        reSort = [reSort; counter 0 temp(2) temp(3)]; % chi1 -> 0
+%         reSort = [reSort; counter 0 temp(2) temp(3)]; % chi1 -> 0
+        reSort = [reSort; counter 0 temp']; % chi1 -> 0
     end
     
     % Calculate the higher order chi terms (ch2 - chi5) if the option
@@ -252,16 +257,16 @@ for resNum=rotamers    % Choose a residue from the list of rotamers
         % reSort!!!!!
         index_dihedral_higher = index_res & atoms_higher{1};
         temp = find(index_dihedral_higher);
-        reSort = [reSort; counter 0 temp(2) temp(3)]; % chi2 -> 0
-        
+%         reSort = [reSort; counter 0 temp(2) temp(3)]; % chi2 -> 0
+        reSort = [reSort; counter 0 temp']; % chi2 -> 0
         if calc_chi3 == 1
         atoms_higher{2} = atoms_c3{1} | atoms_c3{2} | atoms_c3{3} | atoms_c3{4};
         
         % reSort!!!!!
         index_dihedral_higher = index_res & atoms_higher{2};
         temp = find(index_dihedral_higher);
-        reSort = [reSort; counter 0 temp(2) temp(3)]; % chi3 -> 0
-        
+%         reSort = [reSort; counter 0 temp(2) temp(3)]; % chi3 -> 0
+        reSort = [reSort; counter 0 temp']; % chi3 -> 0
         end
         if calc_chi4 == 1
         atoms_higher{3} = atoms_c4{1} | atoms_c4{2} | atoms_c4{3} | atoms_c4{4};
@@ -269,8 +274,8 @@ for resNum=rotamers    % Choose a residue from the list of rotamers
         % reSort!!!!!
         index_dihedral_higher = index_res & atoms_higher{3};
         temp = find(index_dihedral_higher);
-        reSort = [reSort; counter 0 temp(2) temp(3)]; % chi4 -> 0
-        
+%         reSort = [reSort; counter 0 temp(2) temp(3)]; % chi4 -> 0
+        reSort = [reSort; counter 0 temp']; % chi4 -> 0
         end
         if calc_chi5 == 1
         atoms_higher{4} = atoms_c5{1} | atoms_c5{2} | atoms_c5{3} | atoms_c5{4};
@@ -278,8 +283,8 @@ for resNum=rotamers    % Choose a residue from the list of rotamers
         % reSort!!!!!
         index_dihedral_higher = index_res & atoms_higher{4};
         temp = find(index_dihedral_higher);
-        reSort = [reSort; counter 0 temp(2) temp(3)]; % chi5 -> 0
-        
+%         reSort = [reSort; counter 0 temp(2) temp(3)]; % chi5 -> 0
+        reSort = [reSort; counter 0 temp']; % chi5 -> 0
         end
     else
         calc_chi = [calc_chi1 0 0 0 0]; % We're not calculating any higher order chis

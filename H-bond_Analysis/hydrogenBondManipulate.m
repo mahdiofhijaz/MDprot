@@ -5,9 +5,9 @@ function [nHBonds,energies,pair_cell,pair_res_cell,pair_names_cell, angles_cell,
 %
 %% Usage:
 % nHBonds = hydrogenBondManipulate(pdb, traj, forces)
-% nHBonds = hydrogenBondManipulate(pdb, traj, forces, description, cut_off_max, cut_off_min, cut_off_angle, tol_res)
+% nHBonds = hydrogenBondManipulate(pdb, traj, forces, description, comp_mode, cut_off_max, cut_off_min, cut_off_angle, tol_res)
 % [nHBonds,energies,pair_cell,pair_res_cell,pair_names_cell, angles_cell, is_bb_cell] = hydrogenBondManipulate(pdb, traj, forces)
-% [nHBonds,energies,pair_cell,pair_res_cell,pair_names_cell, angles_cell, is_bb_cell] = hydrogenBondManipulate(pdb, traj, forces, description, cut_off_max, cut_off_min, cut_off_angle, tol_res))
+% [nHBonds,energies,pair_cell,pair_res_cell,pair_names_cell, angles_cell, is_bb_cell] = hydrogenBondManipulate(pdb, traj, forces, description, comp_mode, cut_off_max, cut_off_min, cut_off_angle, tol_res))
 %
 %% Description:
 % * nHBonds are the number of hydrogen bonds detected for every frame of
@@ -54,7 +54,7 @@ function [nHBonds,energies,pair_cell,pair_res_cell,pair_names_cell, angles_cell,
 % for backbone Hbond respectively, as numbered and named in PDB. 
 % nFrame x 1 cell structure, where each cell is nHBonds(frame) long.
 %
-% See also hydrogenBondAnalysis, hydrogenBondPeaks
+% See also hydrogenBondAnalysis, hydrogenBondPeaks, hydrogenBondEnergy
 
 % Set the default values:
 if ~exist('cut_off_max','var')
@@ -275,7 +275,7 @@ end
 
 %% Visualization section:
 
-% Plot he manipulat-able H-bond map:
+% Plot the manipulat-able H-bond map:
 
 % Are we doing occupancies or energies?
 if  strcmp(comp_mode,'energy') % Plot the energies!
@@ -325,11 +325,14 @@ legend boxoff
 xlabel('Residue number')
 ylabel('Residue number')
 colorbar
+if strcmp(comp_mode, 'energy')
+    caxis([E_0 0])
+end
 set(gca,'FontSize',15)
 
 % Plot the force:
 subplot(3,1,3)
-smoothing = 1000;
+smoothing = length(forces)/622; % This is a current placeholder
 forces_smooth= smoothdata(forces,'movmean', smoothing); 
 % Correspond 1st column of forces_smooth to the length of the trajectory
 ratio_stride= ceil(forces_smooth(end,1)/size(traj,1));
