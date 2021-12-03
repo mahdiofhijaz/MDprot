@@ -140,11 +140,15 @@ contact_per_res = cell(numRuns,1); % Percentage in which target and protein
 for runi=1:numRuns 
     Nframes(runi) = size(traj{runi},1);
     % initialize dist to be a 3D: Nheavy x Natoms_protein x Nframes matrix
-    dist{runi} = zeros(sum(targetindexHeavy), Natoms, Nframes(runi));
+    
+    % THESE 3D matrices TAKE TOO MUCH memory
+
     if length(target) == 1 % If target is just one residue, calculate atom-wise,
         contact_res{runi} = zeros(sum(targetindexHeavy), Nres, Nframes(runi));
-    else % Otherwise, calculate residue wise
+        dist{runi} = zeros(sum(targetindexHeavy), Natoms, Nframes(runi));
+    else % Otherwise, calculate residue wise, and only save dist in this frame
         contact_res{runi} = zeros(length(target), Nres, Nframes(runi));
+        dist{runi} = zeros(sum(targetindexHeavy), Natoms);
     end
     for frame = 1:Nframes(runi)
         
@@ -169,8 +173,11 @@ for runi=1:numRuns
          
          % Fill the distances into dist matrix
         for pairi = 1:length(dist_list)
-            dist{runi}(pair(pairi,1),pair(pairi,2),frame) = dist_list(pairi);  
-            
+            if length(target) == 1
+                dist{runi}(pair(pairi,1),pair(pairi,2),frame) = dist_list(pairi);  
+            else
+                dist{runi}(pair(pairi,1),pair(pairi,2)) = dist_list(pairi);  
+            end
             % use protIndex to figure out where the atom is in the PDB
             res = pdb.resseq(protIndexFind(pair(pairi,2)));% This residue is found in this interaction
             resNdx_prot = find(Ures{protChainNum}==res);
