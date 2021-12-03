@@ -25,7 +25,7 @@ for protChain = chains'
 
     counter = 1;
     for i = protRes'
-    protResName{counter} = pdb.resname(pdb.resseq == i,:);
+    protResName{counter} =pdb.resname(find((pdb.resseq == i) & (pdb.chainid ==protChain)),:);
     protResName{counter} = protResName{counter}(1,:);
     protResName{counter}(isspace(protResName{counter})) =[];
     if strcmp(protResName{counter},'HSD') % rename histidine
