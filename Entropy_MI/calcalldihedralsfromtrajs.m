@@ -63,7 +63,7 @@ if nargin<6
     transform = 0;
 end
 
-assert(size(pdb.xyz,1) == size(traj,2)/3, 'PDB and trajectory have different number of atoms!')
+
 
 dihedrals = cell(length(rotamers),numRuns);
 resname_cell = cell(length(rotamers),numRuns);
@@ -72,8 +72,10 @@ reSort = [];
 % number of frames
 if numRuns == 1 %traj is a matrix
     nframes = size(traj,1);
+    assert(size(pdb.xyz,1) == size(traj,2)/3, 'PDB and trajectory have different number of atoms!')
 else            % traj is a cell
     nframes = size(traj{1},1);
+    assert(size(pdb.xyz,1) == size(traj{1},2)/3, 'PDB and trajectory have different number of atoms!')
 end
 
 counter = 1; % Counter for number of residues
@@ -107,6 +109,11 @@ res_SG = ['CYS '];
 res_break = ['ALA ';'GLY '];
 % 
     
+if  iscolumn(rotamers) % Make rotamers a row vector so for loop can take it
+    % element by element
+    rotamers = rotamers';
+end
+
 for resNum=rotamers    % Choose a residue from the list of rotamers
     index_res = selectid(pdb.resseq, resNum);
     index_resNext = selectid(pdb.resseq, resNum + 1);
