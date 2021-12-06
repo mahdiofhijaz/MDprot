@@ -14,6 +14,9 @@ function [protResCode, chains] = pdb2seq(pdb)
 % * chains are the chains belonging to the cells of protResCode
 %
 
+resList = {'ARG'; 'ASN'; 'ASP'; 'GLN'; 'GLU'; 'HIS'; 'HSD'; ...
+    'LEU'; 'LYS'; 'MET'; 'PHE'; 'PRO'; 'TRP'; 'TYR';'ILE'; 'VAL';'THR'; ...
+    'SER';'CYS';'ALA';'GLY'};
 chains = unique(pdb.chainid,'stable'); % stable does not reorder the sequence
 protResCode = cell(size(chains));
 
@@ -30,6 +33,12 @@ for protChain = chains'
     protResName{counter}(isspace(protResName{counter})) =[];
     if strcmp(protResName{counter},'HSD') % rename histidine
         protResName{counter} = 'HIS';
+    end
+    
+    % If residue is not in the list, make it any AA (or maybe gap is
+    % better?
+    if isempty(find(strcmp(protResName{counter},resList)))
+        protResName{counter} = 'GAP';
     end
     counter = counter + 1;
     end
