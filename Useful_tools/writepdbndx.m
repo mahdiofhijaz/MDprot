@@ -1,14 +1,14 @@
-function writepdb(filename, pdb, ndx, trj, format_type, bfactor)
+function writepdbndx(filename, pdb, ndx, renum, trj, format_type, bfactor)
 %% writepdb
 % write Protein Data Bank (PDB) file
 %
 %% Syntax
 %# writepdb(filename, pdb);
-%# writepdb(filename, pdb, ndx, crd);
-%# writepdb(filename, pdb, ndx, trj);
-%# writepdb(filename, pdb, ndx, crd, format_type);
-%# writepdb(filename, pdb, ndx, [], format_type);
-%# writepdb(filename, pdb, ndx, [], format_type, bfactor);
+%# writepdb(filename, pdb, ndx, renum, crd);
+%# writepdb(filename, pdb, ndx, renum, trj);
+%# writepdb(filename, pdb, ndx, renum, crd, format_type);
+%# writepdb(filename, pdb, ndx, renum, [], format_type);
+%# writepdb(filename, pdb, ndx, renum, [], format_type, bfactor);
 %
 %% Description
 % This code writes only just ATOM or HETATM records. 
@@ -89,18 +89,22 @@ else
     end
 end
 
-if (nargin < 4) || (numel(trj) == 0)
+if (nargin < 4) % Renumber or not?
+    renum = 0; % Default is do not renumber
+end
+
+if (nargin < 5) || (numel(trj) == 0)
   trj = pdb.xyz';
   trj = trj(:)';
 end
 nframe = size(trj, 1);
   
-if nargin < 5
+if nargin < 6
   format_type = 'default';
 end
 
 is_bfactor = false;
-if (nargin > 5) && (numel(trj) ~= 0)
+if (nargin > 6) && (numel(trj) ~= 0)
   is_bfactor = true;
 end
 
@@ -114,13 +118,29 @@ if strncmpi(format_type, 'namd', numel('namd'))
 end
 
 %% write file
+ndxRes = pdb.resseq(ndx); % Sequence of original pdb
 for iframe = 1:nframe
 
   if(nframe > 1)
     fprintf(fid, 'MODEL %8d\n', iframe);
   end
   
+  resCounter = 1; % Residue counter for renumbering
+  i = 1; % counter loops
   for iatom = ndx
+      if renum == 1
+            if i==1
+                thisRes = 1;
+            elseif ndxRes(i) == ndxRes(i-1) % Are we in the same residue still?
+                thisRes = resCounter;
+            else % we moved to next residue, increase counter!
+                resCounter = resCounter + 1;
+                thisRes = resCounter;
+            end
+            i = i + 1;
+      else
+          thisRes = pdb.resseq(iatom);
+      end
     if strncmpi(format_type, 'vmd', numel('vmd'))
       % VMD format
       fprintf(fid, '%6s', pdb.record(iatom, :));
@@ -132,7 +152,7 @@ for iframe = 1:nframe
       %fprintf(fid, '%1s', ' ');
       fprintf(fid, '%4s', pdb.resname(iatom, :));
       fprintf(fid, '%1s', pdb.chainid(iatom, :));
-      fprintf(fid, '%4d', mod(pdb.resseq(iatom), 10000));
+      fprintf(fid, '%4d', mod(thisRes, 10000));
       %fprintf(fid, '%1s', pdb.icode(iatom, :));
       fprintf(fid, '%1s', ' ');
       fprintf(fid, '%1s', ' ');
@@ -179,7 +199,7 @@ for iframe = 1:nframe
       %fprintf(fid, '%1s', ' ');
       fprintf(fid, '%4s', pdb.resname(iatom, :));
       fprintf(fid, '%1s', pdb.chainid(iatom, :));
-      fprintf(fid, '%4d', mod(pdb.resseq(iatom), 10000));
+      fprintf(fid, '%4d', mod(thisRes, 10000));
       %fprintf(fid, '%1s', pdb.icode(iatom, :));
       fprintf(fid, '%1s', ' ');
       fprintf(fid, '%1s', ' ');
@@ -227,16 +247,16 @@ for iframe = 1:nframe
       %fprintf(fid, '%1s', ' ');
       fprintf(fid, '%4s', pdb.resname(iatom, :));
       fprintf(fid, '%1s', pdb.chainid(iatom, :));
-      if pdb.resseq(iatom) < 10000
-        fprintf(fid, '%4d', pdb.resseq(iatom));
+      if thisRes < 10000
+        fprintf(fid, '%4d', thisRes);
         %fprintf(fid, '%1s', pdb.icode(iatom, :));
         fprintf(fid, '%1s', ' ');
         fprintf(fid, '%1s', ' ');
-      elseif pdb.resseq(iatom) < 100000
-        fprintf(fid, '%5d', pdb.resseq(iatom));
+      elseif thisRes < 100000
+        fprintf(fid, '%5d', thisRes);
         fprintf(fid, '%1s', ' ');
       else
-        fprintf(fid, '%6d', pdb.resseq(iatom));
+        fprintf(fid, '%6d', thisRes);
       end
       fprintf(fid, '%1s', ' ');
       fprintf(fid, '%1s', ' ');
