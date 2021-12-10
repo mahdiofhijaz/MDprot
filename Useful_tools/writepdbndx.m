@@ -33,6 +33,8 @@ function writepdbndx(filename, pdb, ndx, renum, trj, format_type, bfactor)
 % * ndx         -  index of the atoms that you want to save to the pdb file
 %                  [1 x natom] logical with 1 for the atoms you want to
 %                  save or simply the number of atoms in the serial.
+% * renum       -  1 if you want the residue and atom numbers to start from
+%                  1. Defaults to 0.
 % * crd, trj    -  coordinates, or trajecotry of the molecule
 %                  if given, the coordiates of pdb is replaced with
 %                  this data. Trajectory is written as mutiple
@@ -137,14 +139,16 @@ for iframe = 1:nframe
                 resCounter = resCounter + 1;
                 thisRes = resCounter;
             end
+            thisAtom = i; % Renumber atoms starting from 1 too!
             i = i + 1;
       else
           thisRes = pdb.resseq(iatom);
+          thisAtom = pdb.serial(iatom);
       end
     if strncmpi(format_type, 'vmd', numel('vmd'))
       % VMD format
       fprintf(fid, '%6s', pdb.record(iatom, :));
-      fprintf(fid, '%5d', mod(pdb.serial(iatom), 100000));
+      fprintf(fid, '%5d', mod(thisAtom, 100000));
       fprintf(fid, '%1s', ' ');
       fprintf(fid, '%4s', pdb.name(iatom, :));
       fprintf(fid, '%1s', pdb.altloc(iatom, :));
@@ -187,10 +191,10 @@ for iframe = 1:nframe
     elseif strncmpi(format_type, 'namd', numel('namd'))
       % NAMD format
       fprintf(fid, '%6s', pdb.record(iatom, :));
-      if pdb.serial(iatom) < 100000
-        fprintf(fid, '%5d', pdb.serial(iatom));
+      if thisAtom < 100000
+        fprintf(fid, '%5d', thisAtom);
       else
-        fprintf(fid, '%5s', lower(dec2hex(pdb.serial(iatom))));
+        fprintf(fid, '%5s', lower(dec2hex(thisAtom)));
       end
       fprintf(fid, '%1s', ' ');
       fprintf(fid, '%4s', pdb.name(iatom, :));
@@ -235,11 +239,11 @@ for iframe = 1:nframe
     else
       % PDB format with some extentions for large digits of atom_serial and resseq
       fprintf(fid, '%6s', pdb.record(iatom, :));
-      if pdb.serial(iatom) < 100000
-        fprintf(fid, '%5d', pdb.serial(iatom));
+      if thisAtom < 100000
+        fprintf(fid, '%5d', thisAtom);
         fprintf(fid, '%1s', ' ');
       else
-        fprintf(fid, '%6d', pdb.serial(iatom));
+        fprintf(fid, '%6d', thisAtom);
       end
       fprintf(fid, '%4s', pdb.name(iatom, :));
       fprintf(fid, '%1s', pdb.altloc(iatom, :));
