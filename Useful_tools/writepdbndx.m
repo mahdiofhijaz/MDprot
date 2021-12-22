@@ -83,7 +83,7 @@ end
 %% preparation
 natom = size(pdb.record, 1);
 
-if (nargin < 3) % initialize atom selection to all
+if (nargin < 3) || isempty(ndx) % initialize atom selection to all
     ndx = pdb.serial';
 else
     if  islogical(ndx)
