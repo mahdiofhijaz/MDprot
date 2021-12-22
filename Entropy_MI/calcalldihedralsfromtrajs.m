@@ -222,7 +222,7 @@ for resNum=rotamers    % Choose a residue from the list of rotamers
         atoms_c2{4} = selectname(pdb.name, 'ND1'); 
         elseif resname == 'ILE '
         atoms_c2{3} = selectname(pdb.name, 'CG1');  
-        atoms_c2{4} = selectname(pdb.name, 'CD');
+        atoms_c2{4} = selectname(pdb.name, 'CD', 'CD1'); % Either called CD or CD1
         elseif resname == 'MET '
         atoms_c2{4} = selectname(pdb.name, 'SD'); 
         atoms_c3{3} = selectname(pdb.name, 'SD');
@@ -266,6 +266,7 @@ for resNum=rotamers    % Choose a residue from the list of rotamers
         temp = find(index_dihedral_higher);
 %         reSort = [reSort; counter 0 temp(2) temp(3)]; % chi2 -> 0
         reSort = [reSort; counter 0 temp']; % chi2 -> 0
+        
         if calc_chi3 == 1
         atoms_higher{2} = atoms_c3{1} | atoms_c3{2} | atoms_c3{3} | atoms_c3{4};
         
