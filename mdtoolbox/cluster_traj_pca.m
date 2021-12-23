@@ -28,7 +28,7 @@ end
 [p, ~, ~] = calcpca(trj);
 
 % Find the best number of clusters if the user did not specify
-if ~exist('kclusters', 'var')
+if ~exist('kclusters', 'var') || isempty(kclusters)
   nframes = size(trj,1);
   % Matlab's function for evaluating optimal clustering
   % Evaluate from 1:sqrt(nframes) clusters
@@ -46,6 +46,8 @@ for k=1:kclusters % For every centroid
  [~,ind_centers(k)] = min(vecnorm(p(:,1:kPrinComp)-centroid_pca(k,:),2,2));  
 end
 
+pcaRange = range(p,'all');
+
 % Plot the data
   figure
   scatter(p(:, 1), p(:, 2), 50, indexOfCluster_pca, 'filled');
@@ -61,6 +63,9 @@ end
   legend('Data','Centroids')
   legend boxoff
   
-  
+  for i = 1:size(centroid_pca,1)
+     % Add text label for runs with proper offset
+    text(centroid_pca(i,1)+pcaRange/50,centroid_pca(i,2)+pcaRange/50,['C' num2str(i)],'FontSize',14) 
+  end
 end
 
