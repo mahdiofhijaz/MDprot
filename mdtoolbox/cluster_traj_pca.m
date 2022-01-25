@@ -1,4 +1,4 @@
-function [indexOfCluster_pca, centroid_pca, p, ind_centers] = cluster_traj_pca(trj, kPrinComp, kclusters, find_mean)
+function [indexOfCluster_pca, centroid_pca, p, ind_centers] = cluster_traj_pca(trj, kPrinComp, kclusters, find_mean, kmax)
 %cluster_traj_pca Cluster trajectories by performing kmeans on the PCA
 % This function uses the mdtoolbox package from https://mdtoolbox.readthedocs.io/en/latest/
 %
@@ -13,13 +13,15 @@ function [indexOfCluster_pca, centroid_pca, p, ind_centers] = cluster_traj_pca(t
 % * kclusters: number of clusters, if not provided, the default will be
 % evaluated using "evalclusters" function, note that this will make the
 % function slower
-% * find_mean: if this variable exists, mean strcuture will be determined
+% * find_mean: if this variable equals to 1, mean structure will be determined
+% * kmax: maximum k for the algorithm to consider, defaults to square root
+% of the number of frames in the trajectory
 % * indexOfCluster_pca: indices of the cluster: [nframes x 1]
 % * centroid_pca: the centroids of the clusters, kclusters x kPrinComp
 % * p (projection):  principal components (projection of the trajectory on to principal modes) [nframes x 3natoms]
 % * ind_centers: the index of the frame closest to the centroid of each cluster
 
-if exist('find_mean', 'var')
+if exist('find_mean', 'var') && find_mean == 1
 % Find the mean structure of the trajectory
 [~, trj] = meanstructure(trj);
 end
@@ -29,11 +31,15 @@ end
 
 % Find the best number of clusters if the user did not specify
 if ~exist('kclusters', 'var') || isempty(kclusters)
+    
   nframes = size(trj,1);
+  if ~exist('kmax', 'var') % Default kmax to square root of total frames
+        kmax = round(sqrt(nframes));
+  end
   % Matlab's function for evaluating optimal clustering
   % Evaluate from 1:sqrt(nframes) clusters
 %   E = evalclusters((trj),'kmeans','CalinskiHarabasz','klist',1:round(sqrt(nframes)));
-  E = evalclusters(real(p(:,1:kPrinComp)),'kmeans','CalinskiHarabasz','klist',1:round(sqrt(nframes)));
+  E = evalclusters(real(p(:,1:kPrinComp)),'kmeans','CalinskiHarabasz','klist',1:kmax);
   kclusters = E.OptimalK;
 end
 
@@ -51,8 +57,8 @@ pcaRange = range(p,'all');
 % Plot the data
   figure
   scatter(p(:, 1), p(:, 2), 50, indexOfCluster_pca, 'filled');
-  xlabel('PCA 1', 'fontsize', 25);
-  ylabel('PCA 2', 'fontsize', 25);
+  xlabel('PC 1', 'fontsize', 25);
+  ylabel('PC 2', 'fontsize', 25);
   title(['Clustering with ' num2str(kPrinComp) ' PCs'])
   
   hold on
