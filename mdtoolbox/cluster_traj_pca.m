@@ -21,9 +21,11 @@ function [indexOfCluster_pca, centroid_pca, p, ind_centers] = cluster_traj_pca(t
 % * p (projection):  principal components (projection of the trajectory on to principal modes) [nframes x 3natoms]
 % * ind_centers: the index of the frame closest to the centroid of each cluster
 
-if exist('find_mean', 'var') && find_mean == 1
-% Find the mean structure of the trajectory
-[~, trj] = meanstructure(trj);
+if exist('find_mean', 'var') 
+    if find_mean == 1
+        % Find the mean structure of the trajectory
+        [~, trj] = meanstructure(trj);
+    end
 end
 
 % Calc the PCA and do the clustering:
