@@ -134,11 +134,11 @@ for resNum=rotamers    % Choose a residue from the list of rotamers
     resNum
     
     % Recognize termini:
-    if resNum == pdb.resseq(1) | ismember(resNum,isCterm) | ...
+    if resNum == pdb.resseq(1) | ismember(resNum,isNterm) | ...
             (abs(resNum - pdb.resseq(min(find(index_res)) - 1)) > 1) % This is most likely an N-term
            calc_bb(1) = 0;    
          
-    elseif resNum == pdb.resseq(end) | ismember(resNum,isNterm) | ...
+    elseif resNum == pdb.resseq(end) | ismember(resNum,isCterm) | ...
             (abs(pdb.resseq(max(find(index_res)) + 1) - resNum) > 1) % This is most likely an C-term
           calc_bb(2) = 0; 
     end
