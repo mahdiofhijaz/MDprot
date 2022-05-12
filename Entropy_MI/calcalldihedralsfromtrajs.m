@@ -114,6 +114,13 @@ if  iscolumn(rotamers) % Make rotamers a row vector so for loop can take it
     rotamers = rotamers';
 end
 
+% Do some termini recognition using chainids:
+chainChange = find(diff(pdb.chainid)); % find when chain ID changes
+
+% chainChange reports the index of the element BEFORE the chain break
+isCterm =  pdb.resseq(chainChange);
+isNterm =  pdb.resseq(chainChange+1);
+
 for resNum=rotamers    % Choose a residue from the list of rotamers
     index_res = selectid(pdb.resseq, resNum);
     index_resNext = selectid(pdb.resseq, resNum + 1);
@@ -125,14 +132,17 @@ for resNum=rotamers    % Choose a residue from the list of rotamers
     index_phi =  (atoms_bb{3} & index_resBefore) | (index_res & atoms_bb_all);
     calc_bb = [1 1]; % Defaults to calculate both phi and psi respectively
     resNum
-    if resNum == pdb.resseq(1) | ...
+    
+    % Recognize termini:
+    if resNum == pdb.resseq(1) | ismember(resNum,isCterm) | ...
             (abs(resNum - pdb.resseq(min(find(index_res)) - 1)) > 1) % This is most likely an N-term
            calc_bb(1) = 0;    
          
-    elseif resNum == pdb.resseq(end) | ...
+    elseif resNum == pdb.resseq(end) | ismember(resNum,isNterm) | ...
             (abs(pdb.resseq(max(find(index_res)) + 1) - resNum) > 1) % This is most likely an C-term
           calc_bb(2) = 0; 
     end
+    
     
     % reSort section!!!!!
     if calc_bb(1)

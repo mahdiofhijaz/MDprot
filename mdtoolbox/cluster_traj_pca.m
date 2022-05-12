@@ -35,8 +35,10 @@ end
 if ~exist('kclusters', 'var') || isempty(kclusters)
     
   nframes = size(trj,1);
-  if ~exist('kmax', 'var') % Default kmax to square root of total frames
-        kmax = round(sqrt(nframes));
+  if ~exist('kmax', 'var')  % Default kmax to square root of total frames
+      kmax = round(sqrt(nframes));
+  elseif isempty(kmax)
+      kmax = round(sqrt(nframes));
   end
   % Matlab's function for evaluating optimal clustering
   % Evaluate from 1:sqrt(nframes) clusters
