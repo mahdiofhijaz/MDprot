@@ -1,5 +1,6 @@
-function [indexOfCluster_pca, centroid_pca, p, ind_centers] = cluster_traj_pca(trj, kPrinComp, kclusters, find_mean, kmax)
+function [indexOfCluster_pca_sorted, centroid_pca_sorted, p, ind_centers] = cluster_traj_pca(trj, kPrinComp, kclusters, find_mean, kmax)
 %cluster_traj_pca Cluster trajectories by performing kmeans on the PCA
+% The output clusters are sorted by size in descending order
 % This function uses the mdtoolbox package from https://mdtoolbox.readthedocs.io/en/latest/
 %
 %   Usage:
@@ -49,33 +50,48 @@ end
 
  [indexOfCluster_pca, centroid_pca] = kmeans(p(:,1:kPrinComp), kclusters);
  
+  cluster_sizes = zeros(kclusters,1);
+ % Find sizes of clusters
+ for k=1:kclusters 
+   cluster_sizes(k) = length(find(indexOfCluster_pca==k));
+ end
+[cluster_sizes_sorted,cluster_size_ndx] = sort(cluster_sizes,'descend');
+% Now sort indexOfCluster_pca and centroid_pca according to the criterion
+indexOfCluster_pca_sorted = zeros(length(indexOfCluster_pca),1);
+centroid_pca_sorted =  centroid_pca(cluster_size_ndx,:);
+% Fill the sorted clusters in the index file
+ for k=1:kclusters
+      ndx = find(indexOfCluster_pca==cluster_size_ndx(k)); % this will find the kth cluster by size
+      indexOfCluster_pca_sorted(ndx) = k;
+ end
+ 
  % Find the centers  (frames that are closest to the centroids):
  ind_centers = zeros(kclusters,1);
  
 for k=1:kclusters % For every centroid
- [~,ind_centers(k)] = min(vecnorm(p(:,1:kPrinComp)-centroid_pca(k,:),2,2));  
+ [~,ind_centers(k)] = min(vecnorm(p(:,1:kPrinComp)-centroid_pca_sorted(k,:),2,2));  
 end
 
 pcaRange = range(p,'all');
 
 % Plot the data
   figure
-  scatter(p(:, 1), p(:, 2), 50, indexOfCluster_pca, 'filled');
+  scatter(p(:, 1), p(:, 2), 50, indexOfCluster_pca_sorted, 'filled');
   xlabel('PC 1', 'fontsize', 25);
   ylabel('PC 2', 'fontsize', 25);
   title(['Clustering with ' num2str(kPrinComp) ' PCs'])
   
   hold on
   % Plot centroids:
-  scatter(centroid_pca(:,1),centroid_pca(:,2),60,'MarkerEdgeColor',[0 .5 .5],...
+  scatter(centroid_pca_sorted(:,1),centroid_pca_sorted(:,2),60,'MarkerEdgeColor',[0 .5 .5],...
               'MarkerFaceColor',[0 .7 .7],...
               'LineWidth',1.5)
   legend('Data','Centroids')
   legend boxoff
   
-  for i = 1:size(centroid_pca,1)
+  for i = 1:size(centroid_pca_sorted,1)
      % Add text label for runs with proper offset
-    text(centroid_pca(i,1)+pcaRange/50,centroid_pca(i,2)+pcaRange/50,['C' num2str(i)],'FontSize',14) 
+    text(centroid_pca_sorted(i,1)+pcaRange/50,centroid_pca_sorted(i,2)+pcaRange/50,['C' num2str(i)],'FontSize',14) 
   end
 end
 
