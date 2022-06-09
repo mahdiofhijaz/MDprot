@@ -134,7 +134,7 @@ for resNum=rotamers    % Choose a residue from the list of rotamers
     resNum
     
     % Recognize termini:
-    if resNum == pdb.resseq(1) | ismember(resNum,isNterm) | ...
+    if resNum == pdb.resseq(1) | ismember(resNum,isNterm) | resNum == 1 |... 
             (abs(resNum - pdb.resseq(min(find(index_res)) - 1)) > 1) % This is most likely an N-term
            calc_bb(1) = 0;    
          
@@ -177,14 +177,15 @@ for resNum=rotamers    % Choose a residue from the list of rotamers
     elseif sum(ismember(res_break,resname,'rows')) == 1
         calc_chi1 = 0;
     end
-    % Activate an OR to get all the indices of the required atoms
-    atoms_all = atoms{1} | atoms{2} | atoms{3} | atoms{4};
-    % The dihedral for this residue:
-    index_dihedral = index_res & atoms_all; % This will be used in the loop
-    % where the dihedral calculations are done
     
     % reSort section!!!!!
     if calc_chi1
+        % Activate an OR to get all the indices of the required atoms
+        atoms_all = atoms{1} | atoms{2} | atoms{3} | atoms{4};
+        % The dihedral for this residue:
+        index_dihedral = index_res & atoms_all; % This will be used in the loop
+        % where the dihedral calculations are done
+        
         temp = find(index_dihedral);
 %         reSort = [reSort; counter 0 temp(2) temp(3)]; % chi1 -> 0
         reSort = [reSort; counter 0 temp']; % chi1 -> 0
