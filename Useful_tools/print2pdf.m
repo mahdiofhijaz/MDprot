@@ -27,7 +27,7 @@ if isOpengl == 1
     print(file_name, '-dpdf', '-opengl', '-r0');
 
 else
-    print(file_name,'-dpdf', '-r0')
+    print(file_name,'-dpdf', '-vector')
 end
 
 end

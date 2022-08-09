@@ -11,7 +11,7 @@
 traj = readdcd('traj.dcd');
 
 % Read the forces:
-forces = importdata('pullf.dat');
+forces = importdata('pullf.xvg');
 %% Try the functions!
 % Analyze the static structure of the protein
 hydrogenBondAnalysis(pdb,crd);
