@@ -131,13 +131,14 @@ pdb_resseq_target = pdb.resseq(find(targetindexHeavy)); % contains resseq
 
 % Grab index for protein/receptor atoms and their placement in the pdb
 protIndex = selectid(pdb.chainid,protChain);
-protIndexFind = find(protIndex);
 
 if allAtom == 1
     Natoms = sum(protIndex); % Natoms of the protein/receptor
+    protIndexFind = find(protIndex);
 %     targetindexHeavy = targetindex; % Bad naming I know
 else
     Natoms = sum(protIndex.*notHindex); % Take not H atoms
+    protIndexFind = find(protIndex.*notHindex);
 end
 
 Nframes = zeros(numRuns,1);
