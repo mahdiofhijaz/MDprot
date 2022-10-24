@@ -57,7 +57,8 @@ function [dist, contact_res, targetindexHeavy, notHindex, contact_per_res, conta
 % * contactCut: If two residues are below rCut for contactCut fraction 
  % of the simulation or more, they're considered in contact
 %
-% * allAtom: consider all atoms or just heavy ones? Defaults to all atoms
+% * allAtom: consider all atoms or just heavy ones? Defaults to false (only
+% consider heavy atoms)
 
 %% Define default values:
 if ~exist('rCut1', 'var') || isempty(rCut1)
@@ -71,7 +72,7 @@ end
 assert(rCut2>=rCut1,'rCut2 is smaller than rCut1, make sure that rCut2 is equal or larger than rCut1');
 
 if ~exist('allAtom', 'var') || isempty(allAtom)
-        allAtom = 1; % defaults to considering H atoms
+        allAtom = 0; % defaults to considering H atoms
 end
 
 if ~exist('contactCut', 'var') || isempty(contactCut)
