@@ -122,6 +122,11 @@ isCterm =  pdb.resseq(chainChange);
 isNterm =  pdb.resseq(chainChange+1);
 
 for resNum=rotamers    % Choose a residue from the list of rotamers
+    if resNum == 0 % Fake input (useful in tandem with database from md2path)
+        dihedrals{counter} = nan;
+        counter = counter + 1;
+        continue
+    end
     index_res = selectid(pdb.resseq, resNum);
     index_resNext = selectid(pdb.resseq, resNum + 1);
     index_resBefore = selectid(pdb.resseq, resNum - 1);
