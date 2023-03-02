@@ -15,7 +15,7 @@ function [emode, frequency, covar, covar_norm] = gnm(crd, cutoff)
 % (sqrt(eigenvalues)).
 %
 % Also, the covariance matrix of the Cartesian xyz coordinates is
-% calculated from the pseudo inverse of Kirchoff matrix. 
+% calculated from the pseudo inverse of Kirchoff matrix.
 % In the calculation, the spring constant of 1.0 kcal/mol/A^2, 
 % and kBT = 1.0 kcal/mol are assumed.
 %

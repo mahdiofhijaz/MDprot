@@ -31,6 +31,7 @@ end
 
 % Calc the PCA and do the clustering:
 [p, ~, ~] = calcpca(trj);
+[~, ~, ~, ~, explained] = pca(trj); % get %ge explained by every PC
 
 % Find the best number of clusters if the user did not specify
 if ~exist('kclusters', 'var') || isempty(kclusters)
@@ -76,22 +77,40 @@ pcaRange = range(p,'all');
 
 % Plot the data
   figure
-  scatter(p(:, 1), p(:, 2), 50, indexOfCluster_pca_sorted, 'filled');
-  xlabel('PC 1', 'fontsize', 25);
-  ylabel('PC 2', 'fontsize', 25);
-  title(['Clustering with ' num2str(kPrinComp) ' PCs'])
+  if kPrinComp == 2
+    scatter(p(:, 1), p(:, 2), 15, indexOfCluster_pca_sorted, 'filled');
+  else 
+    scatter3(p(:, 1), p(:, 2), p(:, 3),10, indexOfCluster_pca_sorted, 'filled', ...
+        'MarkerFaceAlpha',0.5);
+    zlabel(['PC 3, ' num2str(explained(3),'%.2f') ' explained'], 'fontsize', 25);
+  end
+  xlabel(['PC 1, ' num2str(explained(1),'%.2f') ' explained'], 'fontsize', 25);
+  ylabel(['PC 2, ' num2str(explained(2),'%.2f') ' explained'], 'fontsize', 25);
+  title(['Clustering with ' num2str(kPrinComp) ' PCs'], 'fontsize', 25)
   
   hold on
   % Plot centroids:
-  scatter(centroid_pca_sorted(:,1),centroid_pca_sorted(:,2),60,'MarkerEdgeColor',[0 .5 .5],...
+  if kPrinComp == 2
+    scatter(centroid_pca_sorted(:,1),centroid_pca_sorted(:,2),60,'MarkerEdgeColor',[0 .5 .5],...
               'MarkerFaceColor',[0 .7 .7],...
               'LineWidth',1.5)
+    for i = 1:size(centroid_pca_sorted,1)
+     % Add text label for runs with proper offset
+    text(centroid_pca_sorted(i,1)+pcaRange/50,centroid_pca_sorted(i,2)+pcaRange/50,['C' num2str(i)],'FontSize',14) 
+    end
+  else
+    scatter3(centroid_pca_sorted(:,1),centroid_pca_sorted(:,2),centroid_pca_sorted(:,3),...
+              60,'MarkerEdgeColor',[0 .5 .5], 'MarkerFaceColor',[0 .7 .7],...
+              'LineWidth',1.5)
+    for i = 1:size(centroid_pca_sorted,1)
+     % Add text label for runs with proper offset
+    text(centroid_pca_sorted(i,1)+pcaRange/50,centroid_pca_sorted(i,2)+pcaRange/50, ...
+        centroid_pca_sorted(i,3)+pcaRange/50,['C' num2str(i)],'FontSize',14) 
+    end
+  end
   legend('Data','Centroids')
   legend boxoff
   
-  for i = 1:size(centroid_pca_sorted,1)
-     % Add text label for runs with proper offset
-    text(centroid_pca_sorted(i,1)+pcaRange/50,centroid_pca_sorted(i,2)+pcaRange/50,['C' num2str(i)],'FontSize',14) 
-  end
+  
 end
 
