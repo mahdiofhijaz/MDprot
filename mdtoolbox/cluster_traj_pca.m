@@ -7,10 +7,13 @@ function [indexOfCluster_pca_sorted, centroid_pca_sorted, p, ind_centers] = clus
 %   [indexOfCluster_pca] = cluster_traj_pca(trj, kPrinComp)
 %   [indexOfCluster_pca, centroid_pca] = cluster_traj_pca(trj, kPrinComp)
 %   [indexOfCluster_pca, centroid_pca] = cluster_traj_pca(trj, kPrinComp, kclusters)
-%   [indexOfCluster_pca, centroid_pca, p, ind_centers] = cluster_traj_pca(trj, kPrinComp, kclusters, find_mean)
+%   [indexOfCluster_pca, centroid_pca, p, ind_centers] = cluster_traj_pca(trj, kPrinComp, kclusters, find_mean, kmax)
 %
 % * trj: is the input trajectory: [nframes x 3natoms]
-% * kPrinComp: number of principal components to be used in clustering
+% * kPrinComp: number of principal components to be used in clustering.
+% The function will visualize up to 4 principal components (4th dimension
+% being size of the scatter points), but clustering can be performed on
+% higher kPrinComp
 % * kclusters: number of clusters, if not provided, the default will be
 % evaluated using "evalclusters" function, note that this will make the
 % function slower
@@ -77,16 +80,22 @@ pcaRange = range(p,'all');
 
 % Plot the data
   figure
-  if kPrinComp == 2
+  if kPrinComp == 2 % 2D plot for 2 principal components
     scatter(p(:, 1), p(:, 2), 15, indexOfCluster_pca_sorted, 'filled');
-  else 
+  elseif kPrinComp == 3 % 3D plot for 3 principal components
     scatter3(p(:, 1), p(:, 2), p(:, 3),10, indexOfCluster_pca_sorted, 'filled', ...
         'MarkerFaceAlpha',0.5);
     zlabel(['PC 3, ' num2str(explained(3),'%.2f') ' explained'], 'fontsize', 25);
+  else % 3D plot for 3+ principal components, where 4th component is size of the scatter points
+     % Scale size from 5 to 50
+     sizeFcn = 45/range(p(:, 4))*(p(:, 4) + abs(min(p(:, 4)))) + 5;
+     scatter3(p(:, 1), p(:, 2), p(:, 3),sizeFcn, indexOfCluster_pca_sorted, 'filled', ...
+        'MarkerFaceAlpha',0.5);
+     zlabel(['PC 3, ' num2str(explained(3),'%.2f') ' explained'], 'fontsize', 25); 
   end
   xlabel(['PC 1, ' num2str(explained(1),'%.2f') ' explained'], 'fontsize', 25);
   ylabel(['PC 2, ' num2str(explained(2),'%.2f') ' explained'], 'fontsize', 25);
-  title(['Clustering with ' num2str(kPrinComp) ' PCs'], 'fontsize', 25)
+  title(['Clustering with ' num2str(kPrinComp) ' PCs, ' num2str(sum(explained(1:kPrinComp)),'%.2f') ' explained total'], 'fontsize', 25)
   
   hold on
   % Plot centroids:
