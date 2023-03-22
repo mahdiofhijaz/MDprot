@@ -52,7 +52,7 @@ if ~exist('kclusters', 'var') || isempty(kclusters)
   kclusters = E.OptimalK;
 end
 
- [indexOfCluster_pca, centroid_pca] = kmeans(p(:,1:kPrinComp), kclusters);
+ [indexOfCluster_pca, centroid_pca] = kmeans(p(:,1:kPrinComp), kclusters,'Replicates',5,'Display','final');
  
   cluster_sizes = zeros(kclusters,1);
  % Find sizes of clusters
