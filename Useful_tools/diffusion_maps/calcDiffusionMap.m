@@ -25,9 +25,10 @@ function [diffMapt, Lambda, D2] = calcDiffusionMap(A,options)
     %
     %       t: scaling parameter, equivalent to moving the diffusion 
     %       process forward in time. Allows Discovery of different scale of
-    %       unerlying patterns in the data
+    %       underlying patterns in the data
     % 
     % see also calcAffinityMat
+    %
     % Mahdi Hijazi (2023)
     arguments   
        A

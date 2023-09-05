@@ -31,6 +31,10 @@ function [my_pure_colormap] = colormapCustom(mapName,options)
 %
 % 'inputColor1' and 'inputColor2': the color input to make the colormap
 %
+% 'isHex': is the input color a hex code? If yes, the function will
+% transform the input colors to RGB before proceeding, defaults to false
+%
+% 'Nsteps': Number of steps in every direction, defaults to 128
 %% Examples:
 %
 % colormapCustom('div','inputColor1', [0 0.4 0.4] ,'inputColor2', [0.8 0.4 0]);
@@ -38,6 +42,8 @@ function [my_pure_colormap] = colormapCustom(mapName,options)
 % colormapCustom('combine','inputColor1', [0 0.8 0.8] ,'inputColor2', [0.8 0 0.8])
 %
 % colormapCustom('seq','inputColor1', [0 0.65 0.65])
+%
+% Mahdi Hijazi (2023)
 
 
 
@@ -46,10 +52,33 @@ function [my_pure_colormap] = colormapCustom(mapName,options)
         options.max_o = 0.9 % Limits of color intensity (between 0 and 1)
         options.inputColor1 
         options.inputColor2 
+        options.isHex = false % Is the input in Hex or RGB?
+        options.Nsteps = 128 % How many steps to consider?
     end
 
+if options.isHex % Transform from Hex to [0 1] range RGB
+    colorHex(1) = options.inputColor1;
+    if isfield(options,'inputColor2')
+        colorHex(2) = options.inputColor2;
+    end
+    for i = 1:length(colorHex)
+        hexHere = colorHex(i);
+        if isstring(hexHere)
+            hexHere = char(colorHex(i));
+        end
+        if strcmpi(hexHere(1,1),'#')
+            hexHere(:,1) = [];
+        end
+        if i == 1
+            options.inputColor1 = reshape(sscanf(hexHere.','%2x'),3,[]).'/255;
+        elseif i == 2
+            options.inputColor2 = reshape(sscanf(hexHere.','%2x'),3,[]).'/255;
+        end
+    end
+end
+
 max_o = options.max_o;
-Nsteps = 50;
+Nsteps = options.Nsteps;
 small_step = max_o/Nsteps;
 if  strcmp(mapName,'default') % Default: From pure blue to pure red  
     pure_blue_map = zeros(Nsteps,3);

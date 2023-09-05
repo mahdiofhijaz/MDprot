@@ -16,9 +16,11 @@ function [A, D, I] = calcAffinityMat(X, options)
     % * options:
     %       kNN: number of nearest neighbors, play with this number to
     %       capture the relationship between datapoints, defaults to 5
+    %
     %       distanceMetric: distance metric used to check for nearest
-    %       neoghbors, defaults to 'euclidean'. Any options available for
+    %       neighbors, defaults to 'euclidean'. Any options available for
     %       pdist2 can be used
+    %
     %       selfTuning: Apply local scaling as in: Zelink-Manor and Perona, 
     %       Self-Tuning Spectral Clustering, 2004. Defaults to 0. The input
     %       number is the nearest neighbor for which the local scaling will
