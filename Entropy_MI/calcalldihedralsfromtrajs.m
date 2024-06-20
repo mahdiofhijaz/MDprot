@@ -100,7 +100,7 @@ atoms{3} = selectname(pdb.name, 'CB');
 
 % Here comes the rub: (GLY and ALA don't have a chi angle, and 
 % their values will be replaced by a NaN)
-res_CG = ['ARG '; 'ASN '; 'ASP '; 'GLN '; 'GLU '; 'HIS '; 'HSD '; ...
+res_CG = ['ARG '; 'ASN '; 'ASP '; 'GLN '; 'GLU '; 'HIS '; 'HSD '; 'HSE ';...
     'LEU '; 'LYS '; 'MET '; 'PHE '; 'PRO '; 'TRP '; 'TYR '];
 res_CG1 = ['ILE '; 'VAL '];
 res_OG1 = ['THR '];
@@ -166,7 +166,9 @@ for resNum=rotamers    % Choose a residue from the list of rotamers
     calc_chi1 = 1; % Defaults to calculating (except GLY and ALA)
     resname = pdb.resname(pdb.resseq == resNum,:);
     resname = resname(1,:);
-    
+    resname = standardizeProtonatedStateName(resname); % Change protonated state names to standard
+    % Standardize resname (Including protonation states)
+
     if sum(ismember(res_CG,resname,'rows')) == 1
         atoms{4} = selectname(pdb.name, 'CG');
     elseif sum(ismember(res_CG1,resname,'rows')) == 1

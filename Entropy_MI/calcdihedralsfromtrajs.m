@@ -71,6 +71,7 @@ for resNum=rotamers    % Choose a residue from the list of rotamers
     % Now depending on the residue: decide what you're gonna do:
     resname = pdb.resname(pdb.resseq == resNum,:);
     resname = resname(1,:);
+    resname = standardizeProtonatedStateName(resname); % Change protonated state names to standard
 
     % Choose the atoms for the dihedral calculation:
     % The first three atoms are always the same
@@ -80,7 +81,7 @@ for resNum=rotamers    % Choose a residue from the list of rotamers
 
     % Here comes the rub: (GLY and ALA don't have a chi angle, and 
     % their values will be replaced by a NaN)
-    res_CG = ['ARG '; 'ASN '; 'ASP '; 'GLN '; 'GLU '; 'HIS '; 'HSD '; ...
+    res_CG = ['ARG '; 'ASN '; 'ASP '; 'GLN '; 'GLU '; 'HIS '; 'HSD ';'HSE '; ...
         'LEU '; 'LYS '; 'MET '; 'PHE '; 'PRO '; 'TRP '; 'TYR '];
     res_CG1 = ['ILE '; 'VAL '];
     res_OG1 = ['THR '];
