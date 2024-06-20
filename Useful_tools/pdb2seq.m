@@ -31,10 +31,8 @@ for protChain = chains'
     protResName{counter} =pdb.resname(find((pdb.resseq == i) & (pdb.chainid ==protChain)),:);
     protResName{counter} = protResName{counter}(1,:);
     protResName{counter}(isspace(protResName{counter})) =[];
-    if strcmp(protResName{counter},'HSD') % rename histidine
-        protResName{counter} = 'HIS';
-    end
-    
+    protResName{counter} = standardizeProtonatedStateName(protResName{counter});
+
     % If residue is not in the list, make it any AA (or maybe gap is
     % better?
     if isempty(find(strcmp(protResName{counter},resList)))
